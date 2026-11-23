@@ -44,6 +44,16 @@
 
 - Check the state with `bw login --check` and `bw unlock --check` before you assume a command will work.
 
+## Pass the password with variables
+
+- Give bw the password through a variable with `bw login --passwordenv BW_PASSWORD` or `bw unlock --passwordenv BW_PASSWORD`. The CLI reads the value from the named variable and never sees it as an argument.
+
+- Set the variable in a terminal the user controls, or let the user type the password at the interactive prompt. The agent never writes a credential value into a variable, a file, a log or a command.
+
+- A login saved through the Secure Vault card cannot be read back into a variable. The agent can confirm the saved login exists, but it cannot see or read the stored values, and the card exists to fill browser sign-ins.
+
+- When the work is done, clear the variable with `unset BW_PASSWORD` so the value does not linger in that shell. Never reuse a password the user sent for one login on a later command.
+
 ## Read passwords
 
 - Sync first with `bw sync` so the local copy matches the server.
