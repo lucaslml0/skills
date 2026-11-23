@@ -1,0 +1,6 @@
+id: "custom.vaultwarden"
+title: "Vaultwarden"
+description: "Use ren's self-hosted Vaultwarden through the Bitwarden CLI (bw)."
+include_in_prompt: true
+require_auth: true
+aliases: ["Bitwarden"]
