@@ -1,0 +1,5 @@
+name: "cloud-mail"
+title: "Use ren's Cloud Mail API (mail.520141025.xyz)"
+description: "Read mail, list and manage @520141025.xyz mailbox addresses, and send mail through ren's Cloud Mail (maillab/cloud-mail) REST API, with the account password read from the Vaultwarden lucas org mail collection."
+category: "Communication"
+include_in_prompt: false
