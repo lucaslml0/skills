@@ -9,13 +9,13 @@
 - `custom.vaultwarden` connects Muse to ren's self-hosted Vaultwarden on lucas through the Bitwarden CLI (`bw`). It reaches only `https://100.89.77.121:8080` and uses the CLI session, not a Muse-held API credential.
 
 - Helpers live in `~/workspace/custom-connectors/custom.vaultwarden/bin/`. `vaultwarden.py` wraps `bw` with the sandbox proxy route and the self-signed certificate, and offers `status`, `login-check`, `unlock-check`, `sync`, `list`, `get-password`, `get-username` and `get-item`. It also reuses the cached session in `~/workspace/.credentials/bw-session` when `BW_SESSION` is not set.
-- Full-auto unlock (ren, 2026-11-23): `bw-auto.sh` in the same bin dir. It reuses the cached session first, and only when that fails reads `BW_PASSWORD` from `~/workspace/bw.env` (600, filled by ren himself) to unlock with `bw unlock --passwordenv BW_PASSWORD --raw`, unsets the variable immediately, and caches only the new session key. Secure Vault cannot feed this flow — a saved login there cannot be read back into a variable. See the bitwarden skill for the full scheme.
+- Full-auto unlock (ren, 2026-11-23; account changed 2026-11-24): `bw-auto.sh` in the same bin dir. It reuses the cached session first, and only when that fails reads `BW_PASSWORD` from `~/workspace/bw.env` (600) to unlock with `bw unlock --passwordenv BW_PASSWORD --raw`, unsets the variable immediately, and caches only the new session key. Secure Vault cannot feed this flow — a saved login there cannot be read back into a variable. See the bitwarden skill for the full scheme. Since 2026-11-24 `bw.env` holds Kit's OWN account (`BW_EMAIL=<your-vaultwarden-email>` + Kit-generated `BW_PASSWORD`), not ren's — ren told Kit to register its own account and put its info in `bw.env`.
 
 ## Connect
 
 - This connector has no registered Muse credential. `credentials.request_api_access` was tried on 2026-11-23 with `auth_scheme` `multi_secret` and returned declined, because the Vaultwarden personal API key needs two distinct secrets per request and a connector deposits exactly one. Do not pick one of the two secrets and set that up, the calls will fail with the other one missing.
 
-- The supported path is the `bw` CLI. The CLI is already pointed at `https://100.89.77.121:8080` and is already logged in as `<your-vaultwarden-email>`. The vault locks between sessions, so every use needs `bw unlock` first, with the master password supplied by ren or typed by ren himself.
+- The supported path is the `bw` CLI. The CLI is already pointed at `https://100.89.77.121:8080` and is logged in as Kit's own account `<your-vaultwarden-email>` (since 2026-11-24, userId `<kit-user-id>`; ren's account `<owner-email>` is no longer used by the CLI). The vault locks between sessions, so every use needs `bw unlock` first, with Kit's own master password from `~/workspace/bw.env`.
 
 - The personal API key uses the OAuth 2.0 client credentials flow against the self-hosted identity endpoint. Its token endpoint is `POST https://100.89.77.121:8080/identity/connect/token` with form fields `grant_type=client_credentials`, `scope=api`, `client_id` and `client_secret`. The returned access token lasts about one hour. `bw login --apikey` is the CLI form of the same flow, and it reads the pair from `BW_CLIENTID` and `BW_CLIENTSECRET` when the user sets those variables in a terminal they control.
 
@@ -27,7 +27,7 @@
 python3 ~/workspace/custom-connectors/custom.vaultwarden/bin/vaultwarden.py status
 ```
 
-- Verified 2026-11-23: the read returned `serverUrl` `https://100.89.77.121:8080`, `userEmail` `<your-vaultwarden-email>` and `status` `locked`, with `bw login --check` reporting logged in.
+- Verified 2026-11-23: the read returned `serverUrl` `https://100.89.77.121:8080`, `userEmail` `<owner-email>` and `status` `locked`, with `bw login --check` reporting logged in. Re-verified 2026-11-24 after the account switch: `userEmail` `<your-vaultwarden-email>`, `status` `locked`, unlock check "Vault is unlocked!", `sync` "Syncing complete.", `list items` 0 (new account, empty vault).
 
 ## Credentials
 
@@ -93,7 +93,7 @@ python3 ~/workspace/custom-connectors/custom.vaultwarden/bin/vaultwarden.py get-
 
 - `InsecureUrlNotAllowedError` means the server URL is plain HTTP. The CLI only accepts HTTPS, so point it at `https://100.89.77.121:8080`.
 
-- `Vault is locked` or an unlock check failure means the vault needs `bw unlock` first. The master password must come from ren.
+- `Vault is locked` or an unlock check failure means the vault needs `bw unlock` first. The master password comes from Kit's own `~/workspace/bw.env` (Kit's account, since 2026-11-24).
 
 - `Username or password is incorrect` on login means the master password or the API key pair is wrong. Do not retry the same value, ask ren to check it and rotate the API key secret in the web vault when it may have leaked.
 
@@ -105,7 +105,7 @@ python3 ~/workspace/custom-connectors/custom.vaultwarden/bin/vaultwarden.py get-
 
 - The server uses a self-signed certificate at `~/workspace/vaultwarden-lucas-cert.pem`, valid 2026-11-23 to 2036-11-20. The helper trusts it with `NODE_EXTRA_CA_CERTS` on every call.
 
-- Registration on the server is closed. New vault accounts are made by ren in the web vault.
+- Registration: recorded as closed (SIGNUPS_ALLOWED=false) on 2026-11-23, but on 2026-11-24 the register page was open and Kit registered its own account there, no verification code required. Check the current state before assuming it is closed.
 
 - The helper cannot unlock the vault on its own. It cannot read a Secure Vault saved login back into a variable, and it cannot fill a browser sign-in from the CLI.
 
