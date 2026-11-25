@@ -1,5 +1,5 @@
 name: "workbench-new-agent-onboarding"
 title: "新 Agent 签到工作台标准流程"
-description: "把一个新子 Agent 接入 xinwen-workbench 工作台：Tailscale 进网、专用 SSH 密钥、ROSTER 与工位、工单 30 分钟轮询、工作日 09:30-23:00 聊天 1 分钟轮询、额度 30 分钟上报（固定 as_of/note/pct/reset 格式）、默认头像，四段提示词全文照抄可用，含入职验收清单；每个占位符逐一停下来等主人确认。"
+description: "把一个新子 Agent 接入 xinwen-workbench 工作台（新人执行视角，含 Lei 2026-11-25 真实入职经验）：入职前自查（内置 Tailscale、定时能力、额度来源）、Tailscale 进网、专用 SSH 密钥、ROSTER 与工位、工单 30 分钟轮询、工作日 09:30-23:00 聊天 1 分钟轮询、额度 30 分钟上报（固定 as_of/note/pct/reset 格式）、头像文件自上传与容器内哈希验收，四段提示词全文照抄可用，含入职验收清单；每个占位符逐一停下来等主人确认。"
 category: "Operations"
 include_in_prompt: false
